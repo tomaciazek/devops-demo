@@ -1,5 +1,6 @@
 # Demo application
-This repository contains a demo application (a simple echo web service).
+This repository contains a demo application (a simple echo web service) including containerization, orchestration,
+IaC and CI/CD code.
 
 
 # Running locally
