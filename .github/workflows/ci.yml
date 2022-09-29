@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Unit tests & linting
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pipenv
+          pipenv install --dev --deploy
+
+      - name: Lint with pylint
+        run: |
+          pipenv run pylint --fail-under=5 --recursive=y ./
+
+      - name: Test with pytest
+        run: |
+          pipenv run pytest
+
+  build:
+    name: Build & push images
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: tomaciazekecho.azurecr.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build & push echo app
+        uses: docker/build-push-action@v3
+        with:
+          context: "{{defaultContext}}:app"
+          tags: tomaciazekecho.azurecr.io/echo:${{ github.sha }}
+          push: true
