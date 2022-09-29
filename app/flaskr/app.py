@@ -11,7 +11,7 @@ from webargs.flaskparser import use_args
 
 spec = APISpec(
     title="Echo web service",
-    version="1.0.0",
+    version="1.0.1",
     openapi_version="3.0.3",
     info=dict(description="A service that echoes the input in JSON format"),
     plugins=[FlaskPlugin(), MarshmallowPlugin()],
